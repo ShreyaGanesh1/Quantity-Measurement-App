@@ -2,16 +2,16 @@ package com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    // Generic Length class (replaces Feet & Inches)
     public static class Length {
 
         private final double value;
         private final LengthUnit unit;
 
-        // Enum for units
         public enum LengthUnit {
-            FEET(12.0),     // 1 foot = 12 inches
-            INCHES(1.0);    // base unit
+            FEET(12.0),          // 1 ft = 12 in
+            INCHES(1.0),         // base unit
+            YARDS(36.0),         // 1 yard = 36 in
+            CENTIMETERS(0.393701); // 1 cm = 0.393701 in
 
             private final double conversionFactor;
 
@@ -33,17 +33,15 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        // Convert to base unit (inches)
+        // Convert everything to inches (base unit)
         private double toBaseUnit() {
             return this.value * this.unit.getConversionFactor();
         }
 
-        // Compare logic
         private boolean compare(Length other) {
             return Double.compare(this.toBaseUnit(), other.toBaseUnit()) == 0;
         }
 
-        // Override equals
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -55,12 +53,16 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // Main method
+    // Main demo
     public static void main(String[] args) {
 
-        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
-        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
+        Length l1 = new Length(1.0, Length.LengthUnit.YARDS);
+        Length l2 = new Length(3.0, Length.LengthUnit.FEET);
 
-        System.out.println("Are equal? " + l1.equals(l2)); // true
+        Length l3 = new Length(1.0, Length.LengthUnit.CENTIMETERS);
+        Length l4 = new Length(0.393701, Length.LengthUnit.INCHES);
+
+        System.out.println("1 yard == 3 feet? " + l1.equals(l2));
+        System.out.println("1 cm == 0.393701 inch? " + l3.equals(l4));
     }
 }
