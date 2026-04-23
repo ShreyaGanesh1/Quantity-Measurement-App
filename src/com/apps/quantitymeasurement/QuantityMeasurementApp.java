@@ -7,64 +7,70 @@ public class QuantityMeasurementApp {
         private final double value;
         private final LengthUnit unit;
 
-        // Enum (same as UC4)
         public enum LengthUnit {
             FEET(12.0),
             INCHES(1.0),
             YARDS(36.0),
             CENTIMETERS(0.393701);
 
-            private final double conversionFactor;
+            private final double factor;
 
-            LengthUnit(double conversionFactor) {
-                this.conversionFactor = conversionFactor;
+            LengthUnit(double factor) {
+                this.factor = factor;
             }
 
-            public double getConversionFactor() {
-                return conversionFactor;
+            public double getFactor() {
+                return factor;
             }
         }
 
-        // Constructor
         public Length(double value, LengthUnit unit) {
-            if (unit == null)
-                throw new IllegalArgumentException("Unit cannot be null");
-
-            if (!Double.isFinite(value))
-                throw new IllegalArgumentException("Invalid value");
+            if (unit == null) throw new IllegalArgumentException("Unit cannot be null");
+            if (!Double.isFinite(value)) throw new IllegalArgumentException("Invalid value");
 
             this.value = value;
             this.unit = unit;
         }
 
-        // Convert to base unit (inches)
+        // Convert to base (inches)
         private double toBaseUnit() {
-            return this.value * this.unit.getConversionFactor();
+            return value * unit.getFactor();
         }
 
-        // -------- UC5: STATIC CONVERT METHOD --------
-        public static double convert(double value, LengthUnit source, LengthUnit target) {
-
-            if (source == null || target == null)
+        // -------- UC5 (reuse) --------
+        public static double convert(double value, LengthUnit from, LengthUnit to) {
+            if (from == null || to == null)
                 throw new IllegalArgumentException("Units cannot be null");
 
             if (!Double.isFinite(value))
                 throw new IllegalArgumentException("Invalid value");
 
-            // Convert to base (inches)
-            double baseValue = value * source.getConversionFactor();
-
-            // Convert to target
-            return baseValue / target.getConversionFactor();
+            double base = value * from.getFactor();
+            return base / to.getFactor();
         }
 
-        // Instance conversion
-        public Length convertTo(LengthUnit targetUnit) {
-            double newValue = convert(this.value, this.unit, targetUnit);
-            return new Length(newValue, targetUnit);
+        // -------- UC6: ADD METHOD --------
+        public Length add(Length other) {
+            if (other == null)
+                throw new IllegalArgumentException("Other length cannot be null");
+
+            // convert both to base
+            double sumBase = this.toBaseUnit() + other.toBaseUnit();
+
+            // convert back to THIS unit
+            double result = sumBase / this.unit.getFactor();
+
+            return new Length(result, this.unit);
         }
 
-        // Equals (same as UC4)
+        // Optional static version
+        public static Length add(Length l1, Length l2) {
+            if (l1 == null || l2 == null)
+                throw new IllegalArgumentException("Lengths cannot be null");
+
+            return l1.add(l2);
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -80,28 +86,14 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // Demo methods
-    public static void demonstrateLengthConversion(double value,
-                                                   Length.LengthUnit from,
-                                                   Length.LengthUnit to) {
-
-        double result = Length.convert(value, from, to);
-        System.out.println(value + " " + from + " = " + result + " " + to);
-    }
-
-    public static void demonstrateLengthConversion(Length length,
-                                                   Length.LengthUnit to) {
-
-        Length converted = length.convertTo(to);
-        System.out.println(length + " = " + converted);
-    }
-
+    // Demo
     public static void main(String[] args) {
 
-        demonstrateLengthConversion(1.0, Length.LengthUnit.FEET, Length.LengthUnit.INCHES);
-        demonstrateLengthConversion(3.0, Length.LengthUnit.YARDS, Length.LengthUnit.FEET);
+        Length l1 = new Length(1.0, Length.LengthUnit.FEET);
+        Length l2 = new Length(12.0, Length.LengthUnit.INCHES);
 
-        Length l = new Length(36.0, Length.LengthUnit.INCHES);
-        demonstrateLengthConversion(l, Length.LengthUnit.YARDS);
+        Length result = l1.add(l2);
+
+        System.out.println("1 ft + 12 in = " + result);
     }
 }

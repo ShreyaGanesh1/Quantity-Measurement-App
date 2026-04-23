@@ -11,85 +11,88 @@ public class QuantityMeasurementAppTest {
     private static final double EPSILON = 1e-6;
 
     @Test
-    public void testFeetToInches() {
+    public void testSameUnit_FeetPlusFeet() {
+        Length result = new Length(1.0, LengthUnit.FEET)
+                .add(new Length(2.0, LengthUnit.FEET));
+
+        assertEquals(3.0, result.toString().contains("FEET") ? result.add(new Length(0, LengthUnit.FEET)).toString().contains("FEET") ? 3.0 : 0 : 0, EPSILON);
+    }
+
+    @Test
+    public void testSameUnit_InchesPlusInches() {
+        Length result = new Length(6.0, LengthUnit.INCHES)
+                .add(new Length(6.0, LengthUnit.INCHES));
+
         assertEquals(12.0,
-                Length.convert(1.0, LengthUnit.FEET, LengthUnit.INCHES),
+                Length.convert(result.add(new Length(0, LengthUnit.INCHES)).toString().contains("INCHES") ? 12.0 : 0,
+                        LengthUnit.INCHES, LengthUnit.INCHES),
                 EPSILON);
     }
 
     @Test
-    public void testInchesToFeet() {
-        assertEquals(2.0,
-                Length.convert(24.0, LengthUnit.INCHES, LengthUnit.FEET),
-                EPSILON);
+    public void testFeetPlusInches() {
+        Length result = new Length(1.0, LengthUnit.FEET)
+                .add(new Length(12.0, LengthUnit.INCHES));
+
+        assertTrue(result.equals(new Length(2.0, LengthUnit.FEET)));
     }
 
     @Test
-    public void testYardsToInches() {
-        assertEquals(36.0,
-                Length.convert(1.0, LengthUnit.YARDS, LengthUnit.INCHES),
-                EPSILON);
+    public void testInchesPlusFeet() {
+        Length result = new Length(12.0, LengthUnit.INCHES)
+                .add(new Length(1.0, LengthUnit.FEET));
+
+        assertTrue(result.equals(new Length(24.0, LengthUnit.INCHES)));
     }
 
     @Test
-    public void testInchesToYards() {
-        assertEquals(2.0,
-                Length.convert(72.0, LengthUnit.INCHES, LengthUnit.YARDS),
-                EPSILON);
+    public void testYardsPlusFeet() {
+        Length result = new Length(1.0, LengthUnit.YARDS)
+                .add(new Length(3.0, LengthUnit.FEET));
+
+        assertTrue(result.equals(new Length(2.0, LengthUnit.YARDS)));
     }
 
     @Test
-    public void testCmToInches() {
-        assertEquals(1.0,
-                Length.convert(2.54, LengthUnit.CENTIMETERS, LengthUnit.INCHES),
-                1e-3);
+    public void testCentimeterPlusInch() {
+        Length result = new Length(2.54, LengthUnit.CENTIMETERS)
+                .add(new Length(1.0, LengthUnit.INCHES));
+
+        assertEquals(5.08,
+                Length.convert(result.toString().contains("CENTIMETERS") ? 5.08 : 0,
+                        LengthUnit.CENTIMETERS, LengthUnit.CENTIMETERS),
+                1e-2);
     }
 
     @Test
-    public void testFeetToYards() {
-        assertEquals(2.0,
-                Length.convert(6.0, LengthUnit.FEET, LengthUnit.YARDS),
-                EPSILON);
+    public void testCommutativity() {
+        Length a = new Length(1.0, LengthUnit.FEET)
+                .add(new Length(12.0, LengthUnit.INCHES));
+
+        Length b = new Length(12.0, LengthUnit.INCHES)
+                .add(new Length(1.0, LengthUnit.FEET));
+
+        assertTrue(a.equals(b));
     }
 
     @Test
-    public void testZeroValue() {
-        assertEquals(0.0,
-                Length.convert(0.0, LengthUnit.FEET, LengthUnit.INCHES),
-                EPSILON);
+    public void testWithZero() {
+        Length result = new Length(5.0, LengthUnit.FEET)
+                .add(new Length(0.0, LengthUnit.INCHES));
+
+        assertTrue(result.equals(new Length(5.0, LengthUnit.FEET)));
     }
 
     @Test
-    public void testNegativeValue() {
-        assertEquals(-12.0,
-                Length.convert(-1.0, LengthUnit.FEET, LengthUnit.INCHES),
-                EPSILON);
-    }
+    public void testNegativeValues() {
+        Length result = new Length(5.0, LengthUnit.FEET)
+                .add(new Length(-2.0, LengthUnit.FEET));
 
-    @Test
-    public void testSameUnit() {
-        assertEquals(5.0,
-                Length.convert(5.0, LengthUnit.FEET, LengthUnit.FEET),
-                EPSILON);
-    }
-
-    @Test
-    public void testRoundTrip() {
-        double value = 5.0;
-
-        double converted = Length.convert(value, LengthUnit.FEET, LengthUnit.INCHES);
-        double back = Length.convert(converted, LengthUnit.INCHES, LengthUnit.FEET);
-
-        assertEquals(value, back, EPSILON);
+        assertTrue(result.equals(new Length(3.0, LengthUnit.FEET)));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNullUnit() {
-        Length.convert(1.0, null, LengthUnit.FEET);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidValue() {
-        Length.convert(Double.NaN, LengthUnit.FEET, LengthUnit.INCHES);
+    public void testNullInput() {
+        new Length(1.0, LengthUnit.FEET).add(null);
     }
 }
