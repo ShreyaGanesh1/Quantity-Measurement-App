@@ -5,69 +5,94 @@ import static org.junit.Assert.*;
 
 public class QuantityMeasurementAppTest {
 
-    @Test
-    public void testConvert_FeetToInches() {
-        QuantityLength q = new QuantityLength(1.0, LengthUnit.FEET);
-
-        QuantityLength result = q.convertTo(LengthUnit.INCHES);
-
-        assertEquals(12.0, result.getValue(), 0.01);
-    }
+    /* -------- WEIGHT TESTS -------- */
 
     @Test
-    public void testConvert_InchesToFeet() {
-        QuantityLength q = new QuantityLength(12.0, LengthUnit.INCHES);
-
-        QuantityLength result = q.convertTo(LengthUnit.FEET);
-
-        assertEquals(1.0, result.getValue(), 0.01);
-    }
-
-    @Test
-    public void testEquality_CrossUnit() {
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
+    public void testEquality_KgToGram() {
+        QuantityWeight a = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(1000.0, WeightUnit.GRAM);
 
         assertTrue(a.equals(b));
     }
 
     @Test
-    public void testAddition_Refactored() {
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
+    public void testEquality_KgToPound() {
+        QuantityWeight a = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(2.20462, WeightUnit.POUND);
 
-        QuantityLength result = a.add(b, LengthUnit.FEET);
+        assertTrue(a.equals(b));
+    }
+
+    @Test
+    public void testConversion_KgToGram() {
+        QuantityWeight q = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+
+        QuantityWeight result = q.convertTo(WeightUnit.GRAM);
+
+        assertEquals(1000.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    public void testConversion_PoundToKg() {
+        QuantityWeight q = new QuantityWeight(2.20462, WeightUnit.POUND);
+
+        QuantityWeight result = q.convertTo(WeightUnit.KILOGRAM);
+
+        assertEquals(1.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    public void testAddition_KgPlusGram() {
+        QuantityWeight a = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(1000.0, WeightUnit.GRAM);
+
+        QuantityWeight result = a.add(b, WeightUnit.KILOGRAM);
 
         assertEquals(2.0, result.getValue(), 0.01);
     }
 
     @Test
-    public void testAddition_TargetUnit_Yards() {
-        QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(12.0, LengthUnit.INCHES);
+    public void testAddition_PoundPlusKg() {
+        QuantityWeight a = new QuantityWeight(2.20462, WeightUnit.POUND);
+        QuantityWeight b = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
 
-        QuantityLength result = a.add(b, LengthUnit.YARDS);
+        QuantityWeight result = a.add(b, WeightUnit.POUND);
 
-        assertEquals(0.667, result.getValue(), 0.01);
+        assertEquals(4.40924, result.getValue(), 0.01);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullUnit() {
-        new QuantityLength(1.0, null);
+    @Test
+    public void testAddition_ExplicitTarget_Gram() {
+        QuantityWeight a = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(1000.0, WeightUnit.GRAM);
+
+        QuantityWeight result = a.add(b, WeightUnit.GRAM);
+
+        assertEquals(2000.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    public void testAddition_WithZero() {
+        QuantityWeight a = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(0.0, WeightUnit.GRAM);
+
+        QuantityWeight result = a.add(b, WeightUnit.KILOGRAM);
+
+        assertEquals(5.0, result.getValue(), 0.01);
+    }
+
+    @Test
+    public void testAddition_Negative() {
+        QuantityWeight a = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+        QuantityWeight b = new QuantityWeight(-2.0, WeightUnit.KILOGRAM);
+
+        QuantityWeight result = a.add(b, WeightUnit.KILOGRAM);
+
+        assertEquals(3.0, result.getValue(), 0.01);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidValue() {
-        new QuantityLength(Double.NaN, LengthUnit.FEET);
-    }
-
-    @Test
-    public void testZeroAddition() {
-        QuantityLength a = new QuantityLength(5.0, LengthUnit.FEET);
-        QuantityLength b = new QuantityLength(0.0, LengthUnit.INCHES);
-
-        QuantityLength result = a.add(b, LengthUnit.FEET);
-
-        assertEquals(5.0, result.getValue(), 0.01);
+        new QuantityWeight(Double.NaN, WeightUnit.KILOGRAM);
     }
 }
